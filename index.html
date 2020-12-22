@@ -1,0 +1,306 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1" /> 
+        <title>Moodle GIFT Parser</title>
+        <style>
+            * {
+                font-family: system-ui, sans-serif;
+            }
+            body {
+                background: #f7f7f7;
+            }
+            article {
+                margin: 8px 0;
+                padding: 24px;
+                border-radius: 16px;
+                background: #fafafa;
+                border: 1px solid #0002;
+                width: -moz-available;
+                width: -webkit-fill-available;
+            }
+            span {
+                white-space: pre-line;
+                font-size: 15px;
+                line-height: 1.6;
+            }
+            h2 {
+                margin: -6px 0 12px 0 
+            }
+            h2, h1 {
+                font-size: 22px 
+            }
+            h1 {text-align: center;
+            margin-top: 24px}
+            #center {
+                display: flex;
+                justify-content: center;
+                margin-bottom: 8px;
+            }
+            #content {
+                width: 800px;
+                max-width: 800px;
+                display: flex;
+                align-items: center;
+                flex-direction: column;
+            }
+            table {
+                width: 100%;
+                margin-bottom: -25px;
+            }
+            table:first-of-type>tbody>tr>td:first-of-type{
+                border-radius: 8px 0 0 0;
+            }
+            table:first-of-type>tbody>tr>td:last-of-type{
+                border-radius: 0 8px 0 0;
+            }
+            table:last-of-type>tbody>tr>td:first-of-type{
+                border-radius: 0 0 0 8px;
+            }
+            table:last-of-type>tbody>tr>td:last-of-type{
+                border-radius: 0 0 8px 0;
+            }
+            table:last-of-type{
+                margin-bottom: 0;
+            }
+            td {
+                width: 50%;
+                background: #dadada22;
+                border: 1px solid #dadada;
+                padding: 2px 8px 4px;
+                word-break: break-word;
+            }
+            .info {
+                background: #dadada44;
+                border: 2px solid #dadada;
+                border-radius: 2px 8px 8px 8px;
+                padding: 8px 14px;
+                font-size: 90%;
+                margin: 16px 0 0 0;
+            }
+            .true {
+                background: #4caf5011;
+                border: 2px solid #4caf5077;
+            }
+            .false {
+                background: #f9393911;
+                border: 2px solid #f9393955;
+            }
+            input {
+                width: 256px;
+                border-radius: 24px;
+                border: 1px solid #0000;
+                padding: 6px 12px;
+                margin: 8px 0;
+                background: url("data:image/svg+xml,%3Csvg width='11' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 18'%3E%3Cpath fill-rule='evenodd' d='M15.757 15.545l-3.945-4.225a6.993 6.993 0 001.57-4.43c0-3.799-3.001-6.89-6.69-6.89C3.001 0 0 3.091 0 6.89c0 3.8 3.002 6.891 6.691 6.891 1.385 0 2.705-.43 3.834-1.247l3.974 4.257a.854.854 0 001.234.025.919.919 0 00.024-1.271zM6.69 1.798c2.727 0 4.946 2.284 4.946 5.093 0 2.808-2.219 5.093-4.946 5.093S1.746 9.699 1.746 6.89c0-2.809 2.218-5.093 4.945-5.093z'%3E%3C/path%3E%3C/svg%3E") no-repeat scroll 10px 8px;
+                background-color: #dadada44;
+                outline: none !important;
+                padding-left:28px;
+                z-index: 10;
+                transition: all ease .3s;
+            }
+            #clear {
+                height: 27px;
+                width: 27px;
+                padding-bottom: 9px;
+                background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' viewBox='0 0 18 18'%3E%3Cpath d='M10.1,9l4.6-4.6a1.1,1.1,0,0,0,0-1.1,1.1,1.1,0,0,0-1.1,0L9,7.9,4.4,3.3a1.1,1.1,0,0,0-1.1,0,1.1,1.1,0,0,0,0,1.1L7.9,9,3.3,13.6a1.1,1.1,0,0,0,0,1.1,1.1,1.1,0,0,0,1.1,0L9,10.1l4.6,4.6a1.1,1.1,0,0,0,1.1,0,1.1,1.1,0,0,0,0-1.1Z'/%3E%3C/svg%3E") no-repeat 6px 6px;
+                opacity: 1;
+                margin: 0 0 0 4px;
+                background-color: #dadada44;
+                margin-bottom: 0;
+            }
+            .hide {
+                opacity:0 !important;
+                margin: 0 0 0 -27px !important;
+                transform: scale(0);
+            }
+            #scroll {
+                background: url("data:image/svg+xml,%3Csvg width='24' height='48' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14'%3E%3Cpath d='M7.5559,2.85c1.3301,1.2973,2.6602,2.5946,3.9902,3.8919c0.2206,0.2075,0.5758,0.2075,0.7885,0 c0.2205-0.2147,0.2205-0.5605,0-0.7675L7.3905,1.1611c-0.2131-0.2147-0.5679-0.2147-0.7805,0L1.6654,5.9744 c-0.2205,0.2075-0.2205,0.5528,0,0.7675c0.2131,0.2075,0.5679,0.2075,0.7805,0C3.7785,5.4446,5.111,4.1473,6.4436,2.85 c0.0001,3.2042,0.0002,6.4084,0.0002,9.6126C6.4699,12.7687,6.7225,12.9956,6.9963,13c0.1915,0.0031,0.4243-0.1354,0.5146-0.3248 c0.0476-0.0997,0.0456-0.1906,0.0453-0.2126C7.551,12.1641,7.553,8.2476,7.5559,2.85z'/%3E%3C/svg%3E") no-repeat 12px 0;
+                position: fixed;
+                bottom: 24px;
+                right: 24px;
+                box-shadow: 3px 3px 10px 0px #0001;
+                height: 48px;
+                width: 48px;
+                border-radius: 48px;
+                background-color: #f7f7f7 !important;
+            }
+            button {
+                border-radius: 16px;
+                border: 1px solid #0000;
+                background-color: #dadada44 !important;
+                outline: none;
+                height: 32px;
+                width: 32px;
+                transition: all ease .3s;
+            }
+            button:focus, input:focus {
+              border-color: #6666
+            }
+            button:hover {
+                background-color: #dadada99 !important;
+            }
+            button:active {
+                background-color: #dadada22 !important;
+            }
+            #openbtn {
+                background: url("data:image/svg+xml,%3C%3Fxml version='1.0' encoding='utf-8'%3F%3E%3Csvg width='18' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14'%3E%3Cpath d='M11.6517,3.9973H7.4832v-0.257c0-0.218-0.1767-0.3946-0.3947-0.3946H6.9832H6.8778h-2.993 c-0.2761,0-0.5,0.2238-0.5,0.5c0,0.0001,0.0001,0.0002,0.0001,0.0003v1.4012H2.3483c-0.2669,0-0.4804,0.2106-0.4948,0.4739 c-0.0008,0.0042-0.0018,0.008-0.0024,0.0122C1.851,5.7383,1.8483,5.7424,1.8483,5.7473c0,0.007,0.0037,0.0129,0.004,0.0199 C1.8477,5.8196,1.845,5.8727,1.858,5.9267l1.0405,4.3439c0.0613,0.256,0.31,0.4123,0.5657,0.3712 c0.0033,0.0001,0.006,0.0019,0.0094,0.0019h8.1256c0.0181,0.002,0.0339,0.0106,0.0526,0.0106c0.2622,0,0.471-0.2039,0.4921-0.4608 c0.0014-0.0071,0.0032-0.0138,0.0043-0.0211c0.0002-0.0064,0.0037-0.0117,0.0037-0.0182V4.4973 C12.1517,4.2212,11.9279,3.9973,11.6517,3.9973z M3.7766,9.6436L2.9631,6.2473l7.2552,0.0001l0.8135,3.3962H3.7766z M4.3848,4.3458 h2.0984v0.257c0,0.218,0.1766,0.3946,0.3946,0.3946h0.1426h0.0681h4.0632v0.8542L11.1008,5.639 c-0.039-0.1628-0.1571-0.2795-0.3011-0.3383c-0.0184-0.009-0.0374-0.0146-0.0569-0.0212c-0.0265-0.0072-0.052-0.0134-0.0797-0.0161 c-0.0267-0.0044-0.0508-0.0159-0.0788-0.0159L4.3848,5.2473V4.3458z'/%3E%3C/svg%3E%0A") no-repeat 12px 6px;
+                height: 32px;
+                width: 138px;
+                border-radius: 48px;
+                padding-left:24px;
+                padding-bottom:2px;
+                font-size: 12px;
+                font-weight: 500;
+                margin-top: 8px;
+                margin-bottom: 24px;
+            }
+            footer {
+                font-size: 80%;
+                opacity: 0.5;
+                margin: 16px 24px;
+                text-align: center
+            }
+            #drag {
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                width: 400px;
+                height: 400px;
+                background: inherit;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                margin: 24px;
+                border: 4px dashed #000000;
+                border-radius: 24px;
+                transition: all 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+            }
+            #snackbar {
+                position: fixed;
+                bottom: -48px;
+                left: 50%;
+                background: #f7f7f7 !important;
+                padding: 12px 18px;
+                border-radius: 8px;
+                box-shadow: 3px 3px 10px 0px #0001;
+                font-size: 14px;
+                transform: translate(-50%, 0);
+                transition: all 0.8s cubic-bezier(0.22, 1, 0.36, 1)
+            }
+            @-moz-document url-prefix() {
+              #clear {
+                  padding-bottom: 0px!important;
+                  padding-top: 12px;
+              }
+              button {
+                  font-size: 12px;
+              }
+            }
+        </style>
+    </head>
+    <body>
+        <div id="center">
+            <div id="content">
+                <h1>Moodle GIFT Parser</h1>
+                <input id="openfile" style="display:none" accept=".txt, .gift" type="file" onchange="showFile(this)">
+                <div><input autocomplete="off" id="search"><button class="hide" id="clear" onClick='set("")'></div>
+                <div>
+                    <span style="padding-right: 8px;opacity: 0.4;font-size: 80%"><i>Фильтры:</i></span>
+                    <button title="Соответствие" onclick='set("🔀")'>🔀</button>
+                    <button title="Несколько ответов" onclick='set("⬜")'>⬜</button>
+                    <button title="Истина/Ложь" onclick='set("✔️")'>✔️</button>
+                    <button title="Ввод ответа вручную" onclick='set("📃")'>📃</button>
+                </div>
+                <button id="openbtn" onClick="document.getElementById('openfile').click()">Открыть GIFT</button>
+                <div id="generated">
+                </div>
+                <footer>Внуков Д., 2020</footer>
+            </div>
+        </div>
+        <div id="drag" style="transform:scale(0) translate(-50%,-50%)">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 12" width="192">
+            <path d="M11.6517,3.9973H7.4832v-0.257c0-0.218-0.1767-0.3946-0.3947-0.3946H6.9832H6.8778h-2.993
+                c-0.2761,0-0.5,0.2238-0.5,0.5c0,0.0001,0.0001,0.0002,0.0001,0.0003v1.4012H2.3483c-0.2669,0-0.4804,0.2106-0.4948,0.4739
+                c-0.0008,0.0042-0.0018,0.008-0.0024,0.0122C1.851,5.7383,1.8483,5.7424,1.8483,5.7473c0,0.007,0.0037,0.0129,0.004,0.0199
+                C1.8477,5.8196,1.845,5.8727,1.858,5.9267l1.0405,4.3439c0.0613,0.256,0.31,0.4123,0.5657,0.3712
+                c0.0033,0.0001,0.006,0.0019,0.0094,0.0019h8.1256c0.0181,0.002,0.0339,0.0106,0.0526,0.0106c0.2622,0,0.471-0.2039,0.4921-0.4608
+                c0.0014-0.0071,0.0032-0.0138,0.0043-0.0211c0.0002-0.0064,0.0037-0.0117,0.0037-0.0182V4.4973
+                C12.1517,4.2212,11.9279,3.9973,11.6517,3.9973z M3.7766,9.6436L2.9631,6.2473l7.2552,0.0001l0.8135,3.3962H3.7766z M4.3848,4.3458
+                h2.0984v0.257c0,0.218,0.1766,0.3946,0.3946,0.3946h0.1426h0.0681h4.0632v0.8542L11.1008,5.639
+                c-0.039-0.1628-0.1571-0.2795-0.3011-0.3383c-0.0184-0.009-0.0374-0.0146-0.0569-0.0212c-0.0265-0.0072-0.052-0.0134-0.0797-0.0161
+                c-0.0267-0.0044-0.0508-0.0159-0.0788-0.0159L4.3848,5.2473V4.3458z"></path>
+            </svg>
+            <span style="font-size: 20px;font-weight: 600">Открыть файл</span>
+        </div>
+        <button id="scroll" onClick="window.scrollTo({ top: 0, behavior: 'smooth' })"></button>
+        <div id="snackbar">Загружено 5 вопросов</div>
+        <script>
+            var input=document.getElementById("search");
+            var clear=document.getElementById("clear");
+            var snackbar=document.getElementById("snackbar");
+
+            input.oninput=()=> {
+                Array.from(document.getElementsByTagName("article")).forEach(
+                    (i) => i.style.display=i.innerHTML.toLowerCase().indexOf(input.value.toLowerCase()) === -1?"none":"block"
+                )
+                clear.className=input.value===""?"hide":""
+            }
+
+            document.addEventListener('drop', function(e) {
+                e.preventDefault();
+                if (e.dataTransfer.items[0].kind === 'file')
+                    showFile(e.dataTransfer);
+            });
+
+            document.addEventListener('dragover', function (e) {
+                e.preventDefault();
+            });
+            
+            function set(t) {
+                input.value=t;
+                input.oninput()
+            }
+            
+            function showFile(input) {
+                let reader = new FileReader();
+                let generated = document.getElementById("generated");
+                reader.readAsText(input.files[0]);
+                
+                reader.onload = function() {
+                    out = reader.result
+                        .replaceAll(/<.*?>/g, "")
+                        .replaceAll(/\/\/(.*)\n/g, "")
+                        .replaceAll(/~%(.*?)%(.*)/g, "✅ $2")
+                        .replaceAll(/=(.*) ->(.*)/g, "<!--🔀--></t><table><tr><td>$1</td><td>$2</td></tr></table>")
+                        .replaceAll("=%100%", "📃 ")
+                        .replaceAll("=", "✅ ")
+                        .replaceAll("~", "⬜ ")
+                        .replaceAll("TRUE", "✔️ Истина ")
+                        .replaceAll("FALSE", "❌ Ложь ")
+                        .replaceAll("\\n", " ")
+                        .replaceAll("\\", "")
+                        .replaceAll("##", "#")
+                        .replaceAll(/Истина(.*)#(.*)}/gm, "Истина$1</t><div class='info true'>$2</div>}")
+                        .replaceAll(/Ложь(.*)#(.*)}/gm, "Ложь$1<!--✔️--></t><div class='info false'>$2</div>}")
+                        .replaceAll(/#(.*)/g, "\n<div class='info'>$1</div>")
+                        .replaceAll(/<div class='info(.*?)'><\/div>/g, "")
+
+                    generated.innerHTML = "";
+                    i = 0;
+                    for (const match of out.matchAll(/::(.*)::(.*){((.|\n)*?)}/g)) {
+                    i++;
+                    generated.innerHTML += "<article><h2>"+i+". "+match[1].trim()+"</h2><span>"+match[3].trim()+"</span></article>";
+                    }
+                    snackbar.innerHTML = "Загружено " + i + " вопросов";
+                    snackbar.style.transform = "translate(-50%, -64px)";
+                    setTimeout(() => snackbar.style.transform = "translate(-50%, 0)", 5000);
+                };
+                
+                reader.onerror = () => alert(reader.error);
+            }
+        </script>
+    </body>
+</html>
