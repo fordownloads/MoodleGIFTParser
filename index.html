@@ -11,6 +11,17 @@
             body {
                 background: #f7f7f7;
             }
+			i {
+				color:#666;
+				font-size: 80%;
+			}
+			img {
+				max-width: 100%;
+				border-radius: 8px;
+				border: 1px solid #6662;
+			}
+			p {margin: 4px 0}
+			p:last-of-type {margin-bottom:8px}
             article {
                 margin: 8px 0;
                 padding: 24px;
@@ -212,31 +223,17 @@
                     <button title="Соответствие" onclick='set("🔀")'>🔀</button>
                     <button title="Несколько ответов" onclick='set("⬜")'>⬜</button>
                     <button title="Истина/Ложь" onclick='set("✔️")'>✔️</button>
-                    <button title="Ввод ответа вручную" onclick='set("📃")'>📃</button>
+                    <button title="Текстовый ответ" onclick='set("📃")'>📃</button>
+                    <button title="Нет ответа" onclick='set("❗")'>❗</button>
                 </div>
                 <button id="openbtn" onClick="document.getElementById('openfile').click()">Открыть GIFT</button>
                 <div id="generated">
                 </div>
-                <footer>Внуков Д., 2020</footer>
+                <footer>fordownloads, 2020</footer>
             </div>
         </div>
-        <div id="drag" style="transform:scale(0) translate(-50%,-50%)">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 12" width="192">
-            <path d="M11.6517,3.9973H7.4832v-0.257c0-0.218-0.1767-0.3946-0.3947-0.3946H6.9832H6.8778h-2.993
-                c-0.2761,0-0.5,0.2238-0.5,0.5c0,0.0001,0.0001,0.0002,0.0001,0.0003v1.4012H2.3483c-0.2669,0-0.4804,0.2106-0.4948,0.4739
-                c-0.0008,0.0042-0.0018,0.008-0.0024,0.0122C1.851,5.7383,1.8483,5.7424,1.8483,5.7473c0,0.007,0.0037,0.0129,0.004,0.0199
-                C1.8477,5.8196,1.845,5.8727,1.858,5.9267l1.0405,4.3439c0.0613,0.256,0.31,0.4123,0.5657,0.3712
-                c0.0033,0.0001,0.006,0.0019,0.0094,0.0019h8.1256c0.0181,0.002,0.0339,0.0106,0.0526,0.0106c0.2622,0,0.471-0.2039,0.4921-0.4608
-                c0.0014-0.0071,0.0032-0.0138,0.0043-0.0211c0.0002-0.0064,0.0037-0.0117,0.0037-0.0182V4.4973
-                C12.1517,4.2212,11.9279,3.9973,11.6517,3.9973z M3.7766,9.6436L2.9631,6.2473l7.2552,0.0001l0.8135,3.3962H3.7766z M4.3848,4.3458
-                h2.0984v0.257c0,0.218,0.1766,0.3946,0.3946,0.3946h0.1426h0.0681h4.0632v0.8542L11.1008,5.639
-                c-0.039-0.1628-0.1571-0.2795-0.3011-0.3383c-0.0184-0.009-0.0374-0.0146-0.0569-0.0212c-0.0265-0.0072-0.052-0.0134-0.0797-0.0161
-                c-0.0267-0.0044-0.0508-0.0159-0.0788-0.0159L4.3848,5.2473V4.3458z"></path>
-            </svg>
-            <span style="font-size: 20px;font-weight: 600">Открыть файл</span>
-        </div>
         <button id="scroll" onClick="window.scrollTo({ top: 0, behavior: 'smooth' })"></button>
-        <div id="snackbar">Загружено 5 вопросов</div>
+        <div id="snackbar"></div>
         <script>
             var input=document.getElementById("search");
             var clear=document.getElementById("clear");
@@ -271,12 +268,32 @@
                 
                 reader.onload = function() {
                     out = reader.result
-                        .replaceAll(/<.*?>/g, "")
-                        .replaceAll(/\/\/(.*)\n/g, "")
-                        .replaceAll(/~%(.*?)%(.*)/g, "✅ $2")
+                        //.replaceAll(/<.*?>/g, "")
+                        .replaceAll(/(~|=)%0%/g, "~")
+                        .replaceAll(/~%(.*?)%(.*)/g, "✅ $2 ($1%)")
                         .replaceAll(/=(.*) ->(.*)/g, "<!--🔀--></t><table><tr><td>$1</td><td>$2</td></tr></table>")
+                        .replaceAll(/ style=\"(.*?)\"/gm, "")
                         .replaceAll("=%100%", "📃 ")
-                        .replaceAll("=", "✅ ")
+                        .replaceAll(/\s=(.*)/g, "✅ $1")
+                        .replaceAll("<br>", "")
+                        .replaceAll("&nbsp;&nbsp;", "")
+                        .replaceAll(/<i [^>]*>/g, "")
+                        .replaceAll(/<span [^>]*>/g, "")
+                        .replaceAll(/<b[^>]*>/g, "")
+                        .replaceAll(/<u[^>]*>/g, "")
+                        .replaceAll(/<h[1-5]>/g, "")
+                        .replaceAll("<li>", "")
+                        .replaceAll("<ul>", "")
+                        .replaceAll("<i>", "")
+                        .replaceAll("<span>", "")
+                        .replaceAll("</i>", "")
+                        .replaceAll("</b>", "")
+                        .replaceAll("</u>", "")
+                        .replaceAll("</li>", "")
+                        .replaceAll("</ul>", "")
+                        .replaceAll("</span>", "")
+                        .replaceAll(/<\/h[1-5]>/g, "")
+                        .replaceAll(".33333", "")
                         .replaceAll("~", "⬜ ")
                         .replaceAll("TRUE", "✔️ Истина ")
                         .replaceAll("FALSE", "❌ Ложь ")
@@ -287,12 +304,16 @@
                         .replaceAll(/Ложь(.*)#(.*)}/gm, "Ложь$1<!--✔️--></t><div class='info false'>$2</div>}")
                         .replaceAll(/#(.*)/g, "\n<div class='info'>$1</div>")
                         .replaceAll(/<div class='info(.*?)'><\/div>/g, "")
+                        .replaceAll("\n\n", "\n")
 
                     generated.innerHTML = "";
                     i = 0;
-                    for (const match of out.matchAll(/::(.*)::(.*){((.|\n)*?)}/g)) {
+                    for (const match of out.matchAll(/::(.*)::(\[html\]|)(.*){((.|\n)*?)}/g)) {
                     i++;
-                    generated.innerHTML += "<article><h2>"+i+". "+match[1].trim()+"</h2><span>"+match[3].trim()+"</span></article>";
+					if (match[1].trim() == match[3].trim().replaceAll(/<.*?>/g, ""))
+						generated.innerHTML += ("<article><h2>"+i+". "+match[1].trim()+"</h2><span>"+match[4].trim().replaceAll(/\<(\/|)p\>/g, "")+"</span></article>").replaceAll("<span></span>", "❗ Нет решения");
+					else
+						generated.innerHTML += ("<article><h2>"+i+". "+match[1].trim()+"</h2><p><i>"+match[3].trim()+"</i></p><span>"+match[4].trim().replaceAll(/\<(\/|)p\>/g, "")+"</span></article>").replaceAll("<span></span>", "❗ Нет решения");
                     }
                     snackbar.innerHTML = "Загружено " + i + " вопросов";
                     snackbar.style.transform = "translate(-50%, -64px)";
